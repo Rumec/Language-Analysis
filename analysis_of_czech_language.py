@@ -8,9 +8,14 @@ Author: Dominik Rumian
 import operator
 import matplotlib.pyplot as plt
 
-def readFile(nameOfFile):
+def readFile(nameOfFile, letters):
+    """
+    Reads file and stores data about letter count in dictionary letters
+    :param nameOfFile: string, name of file to be analyzed
+    :param letters: dictionary, containing count of individual letters
+    :return: void
+    """
     file = open(nameOfFile, "r")
-    letters = {}
     letterCount = 0
     for line in file:
         for char in line:
@@ -19,19 +24,23 @@ def readFile(nameOfFile):
                 letterCount += 1
     file.close()
     print(letterCount)
-    return letters
 
 def letterAnalysis(dictOfLetters):
+    """
+    Converts dictionary to list of tuples, this list is sorted by descending order
+    :param dictOfLetters: dictionary
+    :return: sorted list of tuples in format (letter, count)
+    """
     lettersKeys = dictOfLetters.keys()
     lettersTupleList = []
     # Sorting letters according their occurrence in the text
     for key in lettersKeys:
-        lettersTupleList.append((key, letters[key]))
+        lettersTupleList.append((key, dictOfLetters[key]))
     lettersTupleList.sort(key = operator.itemgetter(1), reverse = True)
     return lettersTupleList
 
 
-def createPlotData(tupleList):
+def createPlotDataAllLetters(tupleList):
     letters = []
     values = []
     positions = []
@@ -45,7 +54,40 @@ def createPlotData(tupleList):
 
     return letters, values, positions
 
-def plotToPDF(xAxisLabels, yAxisValues, xAxisPositions, xDimension, yDimension):
+
+def createPlotDataVowels(tupleList):
+    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů']
+    vowelsCount = []
+    vowelsValues = []
+    vowelsPositions = []
+    i = 1
+
+    for tup in tupleList:
+        if tup[0] in vowels:
+            vowelsCount.append(tup[0])
+            vowelsValues.append(tup[1])
+            vowelsPositions.append(i)
+            i += 1
+
+    return vowelsCount, vowelsValues, vowelsPositions
+
+def createPlotDataConsonants(tupleList):
+    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů']
+    consonantsCount = []
+    consonantsValues = []
+    consonantsPositions = []
+    i = 1
+
+    for tup in tupleList:
+        if tup[0] not in vowels:
+            consonantsCount.append(tup[0])
+            consonantsValues.append(tup[1])
+            consonantsPositions.append(i)
+            i += 1
+
+    return consonantsCount, consonantsValues, consonantsPositions
+
+def plotToPDF(xAxisLabels, yAxisValues, xAxisPositions, xDimension, yDimension, title):
     # Setting the dimensions of a graph in hundreds of pixels (width x height)
     plt.figure(figsize=(xDimension, yDimension))
     # Plotting the graph
@@ -55,16 +97,32 @@ def plotToPDF(xAxisLabels, yAxisValues, xAxisPositions, xDimension, yDimension):
     # Naming the y-axis
     plt.ylabel('Počet výskytů')
     # Plot title
-    plt.title('Výskyty písmen v češtině')
+    plt.title(title)
     # Printing to PDF file
-    plt.savefig('Vyskyt_pismen.pdf', format='pdf')
+    title = title + ".pdf"
+    plt.savefig(title, format='pdf')
 
+def main():
+    letters = {}
+    # List of books to be analyzed
+    books = ["bible.txt", "anglicke_listy.txt", "bila_nemoc.txt", "bozska_komedie.txt", "cesta_na_sever.txt",
+             "devatero_pohadek.txt", "hovory_s_masarykem.txt", "italske_listy.txt",
+             "krakatit.txt", "newtonuv_mozek.txt"]
 
+    for book in books:
+        readFile(book, letters)
+    tupleList = letterAnalysis(letters)
+    # Plots graph for all letters
+    (letters, values, positions) = createPlotDataAllLetters(tupleList)
+    plotToPDF(letters, values, positions, 14, 6, "All_letters")
+    # Plots graph for vowels
+    (letters, values, positions) = createPlotDataVowels(tupleList)
+    plotToPDF(letters, values, positions, 14, 6, "Vowels_Only")
+    # Plots graph for consonants
+    (letters, values, positions) = createPlotDataConsonants(tupleList)
+    plotToPDF(letters, values, positions, 14, 6, "Consonants_Only")
 
-letters = readFile("bible.txt")
-tupleList = letterAnalysis(letters)
-(letters, values, positions) = createPlotData(tupleList)
-plotToPDF(letters, values, positions, 14, 6)
+main()
 
 
 
