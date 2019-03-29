@@ -7,6 +7,7 @@ Author: Dominik Rumian
 
 import operator
 import matplotlib.pyplot as plt
+import time
 
 def readFile(nameOfFile, letters):
     """
@@ -56,7 +57,7 @@ def createPlotDataAllLetters(tupleList):
 
 
 def createPlotDataVowels(tupleList):
-    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů']
+    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů', 'y', 'ý']
     vowelsCount = []
     vowelsValues = []
     vowelsPositions = []
@@ -72,7 +73,7 @@ def createPlotDataVowels(tupleList):
     return vowelsCount, vowelsValues, vowelsPositions
 
 def createPlotDataConsonants(tupleList):
-    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů']
+    vowels = ['a', 'e', 'i', 'o', 'u', 'á', 'é', 'ě', 'í', 'ó', 'ú', 'ů', 'y', 'ý']
     consonantsCount = []
     consonantsValues = []
     consonantsPositions = []
@@ -103,15 +104,17 @@ def plotToPDF(xAxisLabels, yAxisValues, xAxisPositions, xDimension, yDimension, 
     plt.savefig(title, format='pdf')
 
 def main():
+    # Starting point of time in the beginning
+    start = time.time()
+
     letters = {}
     # List of books to be analyzed
-    books = ["bible.txt", "anglicke_listy.txt", "bila_nemoc.txt", "bozska_komedie.txt", "cesta_na_sever.txt",
-             "devatero_pohadek.txt", "hovory_s_masarykem.txt", "italske_listy.txt",
-             "krakatit.txt", "newtonuv_mozek.txt"]
+    books = ["bible.txt"]
 
     for book in books:
         readFile(book, letters)
     tupleList = letterAnalysis(letters)
+
     # Plots graph for all letters
     (letters, values, positions) = createPlotDataAllLetters(tupleList)
     plotToPDF(letters, values, positions, 14, 6, "All_letters")
@@ -121,6 +124,10 @@ def main():
     # Plots graph for consonants
     (letters, values, positions) = createPlotDataConsonants(tupleList)
     plotToPDF(letters, values, positions, 14, 6, "Consonants_Only")
+
+    # Ending point of program run
+    end = time.time()
+    print("Time of running: ", end - start)
 
 main()
 
